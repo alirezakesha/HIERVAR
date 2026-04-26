@@ -5,11 +5,10 @@ from sklearn.linear_model import RidgeClassifierCV
 from sklearn.metrics import accuracy_score
 import hiervar.miniROCKET as mr
 import hiervar.minirocket_multivariate as mrm
-import hiervar.raster_multivariate as rsm
-import hiervar.classifier as CLF
+# import hiervar.classifier as CLF
 from hiervar.grsr_module import improved_multi_curve_feature_pruner_exp # experimental version
 from sklearn.linear_model import RidgeClassifierCV
-from sklearn.pipeline import make_pipeline
+# from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import RidgeClassifierCV
 
@@ -97,27 +96,6 @@ def MiniROCKET(x_train,y_train, x_test, y_test,function_type='ter',n_features = 
 
 
 
-def RASTER(x_train,y_train, x_test, y_test, sizes = 4 ,n_features = 10000, shuffle_quant = False, parameter=None, fixed= False):
-    if type(parameter) == type(None):
-        if shuffle_quant: 
-            parameter = mr.fit_shuffled_quantiles(x_train,num_features =n_features,sizes= sizes)
-        else: 
-            parameter = mr.fit(x_train,num_features =n_features,sizes= sizes)
-
-
-    dilation , num_feature_dilation , my_size, biases = parameter
-    
-    if fixed==True:
-        my_size = np.ones(len(my_size))*sizes
-        my_size = my_size.astype(np.int64)
-        parameter = (dilation , num_feature_dilation , my_size, biases)
-    
-
-    x_train_trans_org = mr.transform_refined(x_train, parameter,'ter')
-    x_test_trans_org = mr.transform_refined(x_test, parameter,'ter')
-    return x_train_trans_org, x_test_trans_org,parameter
-
-
 
 def MiniROCKET_MV(x_train,y_train, x_test, y_test,n_features = 10000,shuffle_quant=False,parameter = None):
     # parameter = mr.fit(x_train,num_features =n_features)
@@ -132,16 +110,3 @@ def MiniROCKET_MV(x_train,y_train, x_test, y_test,n_features = 10000,shuffle_qua
     x_test_trans_org = mrm.transform(x_test, parameter)
     return x_train_trans_org, x_test_trans_org, parameter
 
-def RASTER_MV(x_train,y_train, x_test, y_test,n_features = 10000,shuffle_quant=False,parameter = None):
-    # parameter = mr.fit(x_train,num_features =n_features)
-    if len(x_train.shape) < 3:
-        raise TypeError("it is not multi variate")
-        
-    # if type(parameter) == type(None):
-    #     dilations, num_features_per_dilation,_, biases = parameter
-    #     parameter = dilations, num_features_per_dilation, biases
-    parameter = rsm.fit(x_train, num_features = n_features)
-    x_train_trans_org = rsm.transform(x_train, parameter)
-    x_test_trans_org = rsm.transform(x_test, parameter)
-    return x_train_trans_org, x_test_trans_org, parameter
- 
